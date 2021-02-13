@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Grocery extends StatefulWidget {
   @override
@@ -6,6 +8,8 @@ class Grocery extends StatefulWidget {
 }
 
 class _GroceryState extends State<Grocery> {
+  final databaseReference = FirebaseDatabase.instance.reference();
+
   //Drop down button 1
   final List numbers = [
     "Apple",
@@ -155,3 +159,5 @@ class _GroceryState extends State<Grocery> {
     );
   }
 }
+
+

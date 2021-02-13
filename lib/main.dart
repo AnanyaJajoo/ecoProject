@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'grocery.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'user_screen.dart';
+
 
 void main() {
   home:
@@ -72,7 +75,11 @@ class MyApp extends StatelessWidget {
                 minWidth: 350.0,
                 height: 50.0,
                 child: RaisedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => UserScreen(),
+                      ));
+                  },
                   child: Text('User', style: TextStyle(fontSize: 20)),
                   elevation: 0.0,
                   color: Colors.white,
