@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "154181404653",
+    "project_id": "aaron-eco-project",
+    "storage_bucket": "aaron-eco-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:154181404653:android:4b0efddb9f424a490849e4",
+        "android_client_info": {
+          "package_name": "com.aarong.ecoProject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "154181404653-ep6vpebb9080bq6u02j5bcus6mv797nq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKYRHaA52yWvt7wjN0u-kf-alGn57dL4U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "154181404653-ep6vpebb9080bq6u02j5bcus6mv797nq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
