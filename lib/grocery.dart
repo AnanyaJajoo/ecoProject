@@ -13,6 +13,79 @@ const paletteDarkBlue = const Color(0xff497a6e);
 TextStyle ListFont = TextStyle(fontSize: 21);
 TextStyle ListFontMini = TextStyle(fontSize: 16);
 
+class RequestListScreen extends StatefulWidget {
+  @override
+  _RequestListScreenState createState() => _RequestListScreenState();
+}
+
+class _RequestListScreenState extends State<RequestListScreen> {
+  void reloadList(){
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    List<Widget> foodList = [];
+
+    Widget itemTile(var name, var time, var id){
+      return Card(
+        child: ListTile(
+            contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 0.0, 10.0),
+            title: Text(name, style: ListFont),
+            subtitle: Text(time),
+            trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(right: 12.0),
+                    child: IconButton(icon: Icon(Icons.check_circle),onPressed: () {
+                      setState(() {
+                        firestoreInstance.collection("pickupDates").doc(id).delete();
+                        foodList = [];
+                      });
+                    },),
+                  )]
+            )
+        ),
+      );
+    }
+
+    Future getMenu(BuildContext context) async {
+      final menu = await firestoreInstance.collection("pickupDates").get();
+      for(var item in menu.docs){
+        var temp = item.data();
+        foodList.add(itemTile(temp["name"], temp["time"], item.id));
+      }
+      return foodList;
+    }
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color(0xFF0f3044),
+        title: Text("Scheduled Pickup Times",style: TextStyle(fontSize: 24,color: Colors.white)),
+      ),
+      body: Column(
+          children:[
+            Expanded(
+              child: FutureBuilder(
+                  future: getMenu(context),
+                  builder: (context, snapshot) {
+                    if(snapshot.connectionState == ConnectionState.done) {
+                      return ListView(
+                        children: foodList,
+                      );
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  }
+              ),
+            )
+          ]),
+    );
+  }
+}
+
+
 class Grocery extends StatefulWidget {
   @override
   GroceryState createState() => GroceryState();
@@ -60,6 +133,13 @@ class GroceryState extends State<Grocery> {
       }
       return foodList;
     }
+    int _selectedIndex = 0;
+
+    void _onItemTapped(int index) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
 
     return Scaffold(
         appBar: AppBar(
@@ -76,18 +156,39 @@ class GroceryState extends State<Grocery> {
             )
           ],
         ),
-        body: FutureBuilder(
-            future: getMenu(context),
-            builder: (context, snapshot) {
-              if(snapshot.connectionState == ConnectionState.done) {
-                return ListView(
-                  children: foodList,
-                );
-              } else {
-                return Center(child: CircularProgressIndicator());
-              }
-            }
-        )
+        body: Column(
+          children:[
+          Expanded(
+            child: FutureBuilder(
+                future: getMenu(context),
+                builder: (context, snapshot) {
+                  if(snapshot.connectionState == ConnectionState.done) {
+                    return ListView(
+                      children: foodList,
+                    );
+                  } else {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                }
+            ),
+          ),SizedBox(
+              width: 300,
+              child: RaisedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => RequestListScreen())
+                  );
+                },
+                child: Text('Pickup Times', style: TextStyle(fontSize: 20)),
+                elevation: 0.0,
+                color: paletteYellow,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+            ),
+        ]),
     );
 
 
