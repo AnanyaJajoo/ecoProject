@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'main.dart';
 import 'package:flutter/material.dart';
 TextStyle ListFont = TextStyle(fontSize: 21);
 TextStyle ListFontMini = TextStyle(fontSize: 16);
+
 
 class UserScreen extends StatelessWidget {
 
@@ -41,9 +44,19 @@ class SupermarketScreen extends StatefulWidget {
 }
 
 class _SupermarketScreenState extends State<SupermarketScreen> {
+  final firestoreInstance = FirebaseFirestore.instance;
+  List<Widget> foodList = [];
 
-  Widget itemTile(var name, int amount, int days){
-    int _userAmount = 0;
+  Future getMenu(BuildContext context) async {
+    final menu = await firestoreInstance.collection("foods").get();
+    for(var item in menu.docs){
+      var temp = item.data();
+      foodList.add(itemTile(temp["foodName"], temp["foodAmount"], temp["foodExpiration"], temp["counter"], item.id));
+    }
+    return foodList;
+  }
+
+  Widget itemTile(var name, int amount, int days, int counter, var id){
     return Card(
       color: paletteLightBlue,
       child: ListTile(
@@ -55,17 +68,19 @@ class _SupermarketScreenState extends State<SupermarketScreen> {
           children: [
             IconButton(icon: Icon(Icons.keyboard_arrow_left),onPressed: () {
               setState(() {
-                if(_userAmount < amount){
-                  _userAmount++;
+                if(counter > 0){
+                  firestoreInstance.collection("foods").doc(id).update({"counter":counter-=1});
                 }
+                foodList = [];
               });
             },),
-            Text("$_userAmount", style: ListFont),
+            Text("$counter", style: ListFont),
             IconButton(icon: Icon(Icons.keyboard_arrow_right),onPressed: () {
               setState(() {
-                if(_userAmount >1) {
-                  _userAmount--;
+                if(counter < amount) {
+                  firestoreInstance.collection("foods").doc(id).update({"counter":counter+=1});
                 }
+                foodList = [];
               });
             },),
           ]
@@ -81,10 +96,17 @@ class _SupermarketScreenState extends State<SupermarketScreen> {
       appBar: AppBar(
         backgroundColor: paletteDarkBlue,
       ),
-      body: ListView(
-        children: [
-          itemTile("Canned Soup", 5, 3)
-        ]
+      body: FutureBuilder(
+        future: getMenu(context),
+        builder: (context, snapshot) {
+          if(snapshot.connectionState == ConnectionState.done) {
+            return ListView(
+              children: foodList,
+            );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
+        }
       )
     );
   }
