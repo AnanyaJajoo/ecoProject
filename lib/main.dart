@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(top: 10.0),
                 child: Text(
-                  "Eco",
+                  "Expir",
                   style: TextStyle(
                       fontFamily: 'Abril Fatface',
                       fontSize: 50.0,

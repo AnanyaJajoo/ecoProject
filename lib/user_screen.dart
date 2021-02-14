@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'main.dart';
 import 'package:flutter/material.dart';
 TextStyle ListFont = TextStyle(fontSize: 21);
@@ -38,6 +37,159 @@ class UserScreen extends StatelessWidget {
   }
 }
 
+class SubmitScreen extends StatefulWidget {
+  @override
+  _SubmitScreenState createState() => _SubmitScreenState();
+}
+
+class _SubmitScreenState extends State<SubmitScreen> {
+  var nameOfPickup = TextEditingController();
+  String dateOfPickup = "Select Date..";
+  DateTime pickedDate = DateTime.now();
+    final firestoreInstance = FirebaseFirestore.instance;
+    List<Widget> foodList = [];
+
+  _pickDate() async {
+    DateTime curDate = await showDatePicker(
+        context: context,
+        initialDate: pickedDate,
+        firstDate: pickedDate,
+        lastDate: DateTime(DateTime.now().year+5));
+    if(curDate!=null){
+      setState(() {
+        pickedDate = curDate;
+        dateOfPickup = "${pickedDate.day}-${pickedDate.month}-${pickedDate.year}";
+        foodList = [];
+      });
+    }
+  }
+
+  Widget itemTile(var name, int days, int counter){
+    return Card(
+      color: paletteLightBlue,
+      child: ListTile(
+          contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 0.0, 10.0),
+          title: Text(name, style: ListFont),
+          subtitle: Text("Expiring In $days days", style: ListFontMini),
+          trailing: Padding(padding: EdgeInsets.only(right:20),child: Text("$counter", style: ListFont))
+      ),
+    );
+  }
+
+  Future<void> submitCounters() async {
+  final menu = await firestoreInstance.collection("foods").get();
+  for(var item in menu.docs){
+    var temp = item.data();
+    if(temp["counter"] > 0){
+      if(temp["foodAmount"]==temp["counter"]){
+        firestoreInstance.collection("foods").doc(item.id).delete();
+      }else {
+        firestoreInstance.collection("foods").doc(item.id).update(
+            {"foodAmount": temp["foodAmount"] - temp["counter"]});
+        firestoreInstance.collection("foods").doc(item.id).update(
+            {"counter": 0});
+      }
+    }
+  }
+}
+
+    Future getMenu(BuildContext context) async {
+      final menu = await firestoreInstance.collection("foods").get();
+      for(var item in menu.docs){
+        var temp = item.data();
+        if(temp["counter"] > 0){
+          foodList.add(itemTile(temp["foodName"], temp["foodExpiration"], temp["counter"]));
+        }
+      }
+      return foodList;
+    }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        backgroundColor: paletteLightGreen,
+        appBar: AppBar(
+            backgroundColor: paletteDarkBlue,
+            title: Text("Request Summary")
+        ),
+        body: Column(
+          children: [Expanded(
+            child: FutureBuilder(
+                future: getMenu(context),
+                builder: (context, snapshot) {
+                  if(snapshot.connectionState == ConnectionState.done) {
+                    return ListView(
+                      children: foodList,
+                    );
+                  } else {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                }
+            ),
+          ),
+            Expanded(
+                child: ListView(
+                  children: <Widget>[
+                    SizedBox(
+                      height: 20,
+                    ),
+                    ListTile(
+                      title: TextField(
+                        controller: nameOfPickup,
+                        decoration: InputDecoration(
+                          fillColor: paletteYellow,
+                          border: OutlineInputBorder(),
+                          labelText: 'Name',
+                        ),
+                      )
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    ListTile(
+                      onTap: (){
+                        _pickDate();
+                      },
+                      title: TextField(
+                        enabled: false,
+                        decoration: InputDecoration(
+                          fillColor: paletteYellow,
+                          border: OutlineInputBorder(),
+                          labelText: dateOfPickup,
+                        ),
+                      )
+                    ),
+                  ],
+                ),
+            ),
+            SizedBox(
+              width: 200,
+              child: RaisedButton(
+                onPressed: () {
+                  firestoreInstance.collection("pickupDates").add({
+                    "time":dateOfPickup,
+                    "name":"${nameOfPickup.text}",
+                  });
+                  submitCounters();
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                child: Text('Send', style: TextStyle(fontSize: 22)),
+                elevation: 0.0,
+                color: paletteYellow,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+            ),
+          ],
+        )
+    );
+  }
+}
+
+
+
 class SupermarketScreen extends StatefulWidget {
   @override
   _SupermarketScreenState createState() => _SupermarketScreenState();
@@ -46,7 +198,6 @@ class SupermarketScreen extends StatefulWidget {
 class _SupermarketScreenState extends State<SupermarketScreen> {
   final firestoreInstance = FirebaseFirestore.instance;
   List<Widget> foodList = [];
-<<<<<<< HEAD
 
   Future getMenu(BuildContext context) async {
     final menu = await firestoreInstance.collection("foods").get();
@@ -57,18 +208,6 @@ class _SupermarketScreenState extends State<SupermarketScreen> {
     return foodList;
   }
 
-=======
-
-  Future getMenu(BuildContext context) async {
-    final menu = await firestoreInstance.collection("foods").get();
-    for(var item in menu.docs){
-      var temp = item.data();
-      foodList.add(itemTile(temp["foodName"], temp["foodAmount"], temp["foodExpiration"], temp["counter"], item.id));
-    }
-    return foodList;
-  }
-
->>>>>>> 65c9edd96ac0f777d881657d0d2ffb4258b37fd8
   Widget itemTile(var name, int amount, int days, int counter, var id){
     return Card(
       color: paletteLightBlue,
@@ -108,18 +247,41 @@ class _SupermarketScreenState extends State<SupermarketScreen> {
       backgroundColor: paletteLightGreen,
       appBar: AppBar(
         backgroundColor: paletteDarkBlue,
+        title: Text("Walmart")
       ),
-      body: FutureBuilder(
-        future: getMenu(context),
-        builder: (context, snapshot) {
-          if(snapshot.connectionState == ConnectionState.done) {
-            return ListView(
-              children: foodList,
-            );
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        }
+      body: Column(
+        children: [Expanded(
+          child: FutureBuilder(
+              future: getMenu(context),
+              builder: (context, snapshot) {
+                if(snapshot.connectionState == ConnectionState.done) {
+                  return ListView(
+                    children: foodList,
+                  );
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              }
+          ),
+        ),
+          SizedBox(
+            width: 300,
+            child: RaisedButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SubmitScreen())
+                );
+              },
+              child: Text('Review Request', style: TextStyle(fontSize: 20)),
+              elevation: 0.0,
+              color: paletteYellow,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+            ),
+          ),
+        ],
       )
     );
   }
