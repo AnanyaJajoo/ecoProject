@@ -1,3 +1,4 @@
+import 'main.dart';
 import 'package:flutter/material.dart';
 TextStyle ListFont = TextStyle(fontSize: 21);
 TextStyle ListFontMini = TextStyle(fontSize: 16);
@@ -7,12 +8,15 @@ class UserScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: paletteLightGreen,
         appBar: AppBar(
+          backgroundColor: paletteDarkBlue,
           title: Text("Select a Grocery Store", style: TextStyle(fontSize: 24,color: Colors.white)),
         ),
         body: ListView(
             children: [
               Card(
+                color: paletteLightBlue,
                 child: ListTile(
                   title: Text("Walmart", style: ListFont),
                   subtitle: Text("Brown Street No.2", style: ListFontMini),
@@ -41,6 +45,7 @@ class _SupermarketScreenState extends State<SupermarketScreen> {
   Widget itemTile(var name, int amount, int days){
     int _userAmount = 0;
     return Card(
+      color: paletteLightBlue,
       child: ListTile(
         contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 0.0, 15.0),
         title: Text(name, style: ListFont),
@@ -72,7 +77,9 @@ class _SupermarketScreenState extends State<SupermarketScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: paletteLightGreen,
       appBar: AppBar(
+        backgroundColor: paletteDarkBlue,
       ),
       body: ListView(
         children: [

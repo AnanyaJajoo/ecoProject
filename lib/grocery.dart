@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+final firestoreInstance = FirebaseFirestore.instance;
 
 class Grocery extends StatefulWidget {
   @override
@@ -8,8 +10,6 @@ class Grocery extends StatefulWidget {
 }
 
 class _GroceryState extends State<Grocery> {
-  final databaseReference = FirebaseDatabase.instance.reference();
-
   //Drop down button 1
   final List numbers = [
     "Apple",
@@ -17,7 +17,7 @@ class _GroceryState extends State<Grocery> {
     "Orange",
     "Pear",
     "Blueberries",
-    "Watermellon",
+    "Watermelon",
     "Strawberries",
     "Cereal",
     "Crackers"
@@ -32,6 +32,13 @@ class _GroceryState extends State<Grocery> {
 
   @override
   Widget build(BuildContext context) {
+    void _onPressed() {
+      firestoreInstance.collection("foods").add({
+        'foodAmount':quantity,
+        'foodExpiration':days,
+        'foodName': nameCity,
+      });
+    }
     return Scaffold(
       appBar: AppBar(title: Text("Grocery")),
       body: Container(
@@ -152,6 +159,10 @@ class _GroceryState extends State<Grocery> {
                   ),
                 ),
               ]),
+              RaisedButton(onPressed: (){
+                _onPressed();
+              }
+              )
             ],
           ),
         ),
@@ -159,5 +170,3 @@ class _GroceryState extends State<Grocery> {
     );
   }
 }
-
-
