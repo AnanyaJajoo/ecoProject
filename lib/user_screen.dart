@@ -46,6 +46,7 @@ class SupermarketScreen extends StatefulWidget {
 class _SupermarketScreenState extends State<SupermarketScreen> {
   final firestoreInstance = FirebaseFirestore.instance;
   List<Widget> foodList = [];
+<<<<<<< HEAD
 
   Future getMenu(BuildContext context) async {
     final menu = await firestoreInstance.collection("foods").get();
@@ -56,6 +57,18 @@ class _SupermarketScreenState extends State<SupermarketScreen> {
     return foodList;
   }
 
+=======
+
+  Future getMenu(BuildContext context) async {
+    final menu = await firestoreInstance.collection("foods").get();
+    for(var item in menu.docs){
+      var temp = item.data();
+      foodList.add(itemTile(temp["foodName"], temp["foodAmount"], temp["foodExpiration"], temp["counter"], item.id));
+    }
+    return foodList;
+  }
+
+>>>>>>> 65c9edd96ac0f777d881657d0d2ffb4258b37fd8
   Widget itemTile(var name, int amount, int days, int counter, var id){
     return Card(
       color: paletteLightBlue,
