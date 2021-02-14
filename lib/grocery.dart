@@ -125,6 +125,7 @@ class GroceryState extends State<Grocery> {
       );
     }
 
+
     Future getMenu(BuildContext context) async {
       final menu = await firestoreInstance.collection("foods").get();
       for(var item in menu.docs){
