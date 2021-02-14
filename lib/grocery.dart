@@ -37,6 +37,7 @@ class _GroceryState extends State<Grocery> {
         'foodAmount':quantity,
         'foodExpiration':days,
         'foodName': nameCity,
+        'counter' : 0,
       });
     }
     return Scaffold(
